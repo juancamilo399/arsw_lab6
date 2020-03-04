@@ -1,6 +1,5 @@
 var Module=(function (){
     var _author;
-
     function _setAuthorName(author) {
         _author = author;
     };
@@ -38,6 +37,18 @@ var Module=(function (){
         });
     };
 
+    function init() {
+            var canvas = document.getElementById("canvasBlueprint"),
+            context = canvas.getContext("2d");
+            if(window.PointerEvent) {
+              canvas.addEventListener("pointerdown", draw, false);
+            }
+            else {
+              //Provide fallback for user agents that do not support Pointer Events
+              canvas.addEventListener("mousedown", draw, false);
+            }
+          }
+
     function _draw(blueprints) {
         $("#canvasName").text("Current blueprint: " + blueprints.name);
         var canvasBlueprint = document.getElementById("canvasBlueprint");
@@ -50,6 +61,28 @@ var Module=(function (){
             ctx.lineTo(point.x,point.y);
         })
         ctx.stroke();
+    }
+
+    function draw(event) {
+            var canvas = document.getElementById("canvasBlueprint"),
+            context = canvas.getContext("2d");
+            var offset  = getOffset(canvas);
+            context.fillRect(event.pageX-offset.left, event.pageY-offset.top, 5, 5);
+    }
+
+          //Helper function to get correct page offset for the Pointer coords
+    function getOffset(obj) {
+              var offsetLeft = 0;
+              var offsetTop = 0;
+              do {
+                if (!isNaN(obj.offsetLeft)) {
+                    offsetLeft += obj.offsetLeft;
+                }
+                if (!isNaN(obj.offsetTop)) {
+                    offsetTop += obj.offsetTop;
+                }
+              } while(obj = obj.offsetParent );
+              return {left: offsetLeft, top: offsetTop};
     }
 
     function getBlueprintsAuthor(author) {
@@ -70,5 +103,6 @@ var Module=(function (){
     return {
         getBlueprintsAuthor: getBlueprintsAuthor,
         getBlueprintsAuthorAndName: getBlueprintsAuthorAndName,
+        init:init
     };
 })();
