@@ -1,5 +1,7 @@
 var Module=(function (){
     var _author;
+    var _open;
+    var puntosNuevos = []
     function _setAuthorName(author) {
         _author = author;
     };
@@ -38,16 +40,34 @@ var Module=(function (){
     };
 
     function init() {
-            var canvas = document.getElementById("canvasBlueprint"),
-            context = canvas.getContext("2d");
-            if(window.PointerEvent) {
-              canvas.addEventListener("pointerdown", draw, false);
-            }
-            else {
-              //Provide fallback for user agents that do not support Pointer Events
-              canvas.addEventListener("mousedown", draw, false);
-            }
-          }
+        var canvas = document.getElementById("canvasBlueprint"),
+        context = canvas.getContext("2d");
+        context.clearRect(0, 0, canvas.width, canvas.height)
+        if(window.PointerEvent) {
+            canvas.addEventListener("pointerdown", draw, false);
+        }else {
+            //Provide fallback for user agents that do not support Pointer Events
+            canvas.addEventListener("mousedown", draw, false);
+        }
+        //pedir nombre
+        var datos = mapearJson();
+        guardarBlueprint();
+        puntosNuevos = [];
+     }
+
+     function mapearJson(){
+        var s = "{ author ";
+     }
+
+    function guardarBlueprint(datos){
+        /*return $.ajax({
+            url: "/AddNewBlueprint",
+            type: 'POST',
+            data: ,
+            contentType: "application/json"
+        });
+        */
+    }
 
     function _draw(blueprints) {
         $("#canvasName").text("Current blueprint: " + blueprints.name);
@@ -68,9 +88,11 @@ var Module=(function (){
             context = canvas.getContext("2d");
             var offset  = getOffset(canvas);
             context.fillRect(event.pageX-offset.left, event.pageY-offset.top, 5, 5);
+            var punto = [event.pageX-offset.left,event.pageY-offset.top];
+            puntosNuevos.push(punto);
     }
 
-          //Helper function to get correct page offset for the Pointer coords
+    //Helper function to get correct page offset for the Pointer coords
     function getOffset(obj) {
               var offsetLeft = 0;
               var offsetTop = 0;

@@ -24,7 +24,7 @@
 
 </br>
 
-<body style='background-image: url("back.png"); background-position: center;background-size: cover;' onload="Module.init()">
+<body style='background-image: url("back.png"); background-position: center;background-size: cover;' >
     <div class="container">
         <div style="float: left">
 
@@ -51,8 +51,12 @@
 
         <div style="float: right">
             <h2 id="canvasName"></h2>
+            <button type="button" class="button1" id="Buttondraw" onclick="Module.init()">Create new blueprint</button>
+            </br>
+            </br>
             <canvas id="canvasBlueprint" width="500" height="500" style="border:1px solid #000000;"> </canvas>
         </div>
+
     </div>
 
 </body>
