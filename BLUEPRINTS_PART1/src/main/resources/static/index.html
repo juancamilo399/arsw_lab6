@@ -24,13 +24,13 @@
 
 </br>
 
-<body style='background-image: url("back.png"); background-position: center;background-size: cover;' >
+<body style='background-image: url("back.png"); background-position: center;background-size: cover;'  onload="Module.init()">
     <div class="container">
         <div style="float: left">
 
             <p>
                 Author: <input id="autor" type="text" placeholder="author">
-                <button type="button" class="button1" id="ButtonBlueprints" onclick="Module.getBlueprintsAuthor(autor.value)">Get blueprints</button>
+                <button type="button" class="btn btn-light" id="ButtonBlueprints" onclick="Module.getBlueprintsAuthor(autor.value)">Get blueprints</button>
             </p>
 
             <h2 id="authorName"></h2>
@@ -51,10 +51,14 @@
 
         <div style="float: right">
             <h2 id="canvasName"></h2>
-            <button type="button" class="button1" id="Buttondraw" onclick="Module.init()">Create new blueprint</button>
+            <button type="button" class="btn-success btn" id="Buttondraw">Create new blueprint</button>
             </br>
             </br>
             <canvas id="canvasBlueprint" width="500" height="500" style="border:1px solid #000000;"> </canvas>
+            </br>
+            <button type="button" class="btn btn-success" id="Buttonsave">save/update</button>
+            <button type="button" class="btn btn-danger" id="Buttondelete">delete</button>
+            </br>
         </div>
 
     </div>

@@ -1,7 +1,9 @@
 var Module=(function (){
     var _author;
     var _open;
-    var puntosNuevos = []
+    var puntosNuevos = [];
+    var enable=false;
+    var _currentblueprint;
     function _setAuthorName(author) {
         _author = author;
     };
@@ -49,10 +51,11 @@ var Module=(function (){
             //Provide fallback for user agents that do not support Pointer Events
             canvas.addEventListener("mousedown", draw, false);
         }
+
         //pedir nombre
-        var datos = mapearJson();
-        guardarBlueprint();
-        puntosNuevos = [];
+        //var datos = mapearJson();
+        //guardarBlueprint();
+        //puntosNuevos = [];
      }
 
      function mapearJson(){
@@ -70,7 +73,12 @@ var Module=(function (){
     }
 
     function _draw(blueprints) {
+        _currentblueprint=blueprints;
         $("#canvasName").text("Current blueprint: " + blueprints.name);
+        redraw(_currentblueprint);
+    }
+
+    function redraw(blueprints) {
         var canvasBlueprint = document.getElementById("canvasBlueprint");
         var ctx = canvasBlueprint.getContext("2d");
         ctx.clearRect(0, 0, canvasBlueprint.width, canvasBlueprint.height);
@@ -87,9 +95,13 @@ var Module=(function (){
             var canvas = document.getElementById("canvasBlueprint"),
             context = canvas.getContext("2d");
             var offset  = getOffset(canvas);
-            context.fillRect(event.pageX-offset.left, event.pageY-offset.top, 5, 5);
+            var coorX= event.pageX-offset.left;
+            var coorY= event.pageY-offset.top;
+            _currentblueprint.points.push({x:coorX,y:coorY});
+            console.log(_currentblueprint);
+            redraw(_currentblueprint);
             var punto = [event.pageX-offset.left,event.pageY-offset.top];
-            puntosNuevos.push(punto);
+            //puntosNuevos.push(punto);
     }
 
     //Helper function to get correct page offset for the Pointer coords
@@ -107,6 +119,8 @@ var Module=(function (){
               return {left: offsetLeft, top: offsetTop};
     }
 
+
+
     function getBlueprintsAuthor(author) {
         _setAuthorName(author);
         if (author == "" || author == null) {
@@ -122,9 +136,18 @@ var Module=(function (){
         client.getBlueprintsByNameAndAuthor(name,author,_draw);
     };
 
+    function  enableCanvas() {
+        enable=true;
+    }
+
+    function  disableCanvas() {
+        enable=false;
+    }
+
+
     return {
         getBlueprintsAuthor: getBlueprintsAuthor,
         getBlueprintsAuthorAndName: getBlueprintsAuthorAndName,
-        init:init
+        init:init,
     };
 })();
