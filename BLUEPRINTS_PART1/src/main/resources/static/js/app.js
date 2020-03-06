@@ -2,7 +2,6 @@ var Module=(function (){
     var _author;
     var _open;
     var puntosNuevos = [];
-    var enable=false;
     var _currentblueprint;
     function _setAuthorName(author) {
         _author = author;
@@ -124,7 +123,7 @@ var Module=(function (){
     function getBlueprintsAuthor(author) {
         _setAuthorName(author);
         if (author == "" || author == null) {
-            alert("Ingrese un valor correcto de nombre");
+            alert("Ingrese un valor");
         } else {
             $("#authorName").text(author + "'s blueprints: ");
             client.getBlueprintsByAuthor(author, _table);
@@ -133,21 +132,41 @@ var Module=(function (){
 
     function getBlueprintsAuthorAndName(author,name) {
         _setAuthorName(author);
+        init();
         client.getBlueprintsByNameAndAuthor(name,author,_draw);
     };
 
-    function  enableCanvas() {
-        enable=true;
+
+    function putBlueprint (){
+
+        var putPromise = $.ajax({
+            url: "/blueprints/"+_currentblueprint.author+"/"+_currentblueprint.name,
+            type: 'PUT',
+            data: JSON.stringify(_currentblueprint),
+            contentType: "application/json"
+        });
+
+        putPromise.then(
+            function () {
+                console.info("blueprint created");
+            },
+            function () {
+                console.info("error");
+            }
+        );
+
+        return putPromise;
     }
 
-    function  disableCanvas() {
-        enable=false;
+    function save() {
+        if(_currentblueprint.name != null && _currentblueprint.author != null){
+            putBlueprint();
+        }
     }
-
 
     return {
         getBlueprintsAuthor: getBlueprintsAuthor,
         getBlueprintsAuthorAndName: getBlueprintsAuthorAndName,
-        init:init,
+        save:save
     };
 })();

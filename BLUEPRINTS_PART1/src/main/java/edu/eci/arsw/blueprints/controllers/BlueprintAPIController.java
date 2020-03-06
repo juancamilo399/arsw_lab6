@@ -80,5 +80,17 @@ public class BlueprintAPIController {
             return new ResponseEntity<>(ex.getMessage(),HttpStatus.FORBIDDEN);
         }
     }
+
+    @RequestMapping(path = "/{author}/{name}",method = RequestMethod.DELETE)
+    public ResponseEntity<?> DeleteBlueprint(@PathVariable ("author") String author, @PathVariable ("name") String name){
+
+        try {
+            bps.deleteBlueprint(author, name);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (BlueprintNotFoundException ex) {
+            Logger.getLogger(BlueprintAPIController.class.getName()).log(Level.SEVERE, null, ex);
+            return new ResponseEntity<>(ex.getMessage(),HttpStatus.FORBIDDEN);
+        }
+    }
 }
 
