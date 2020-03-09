@@ -51,10 +51,6 @@ var Module=(function (){
             canvas.addEventListener("mousedown", draw, false);
         }
 
-        //pedir nombre
-        //var datos = mapearJson();
-        //guardarBlueprint();
-        //puntosNuevos = [];
      }
 
      function mapearJson(){
@@ -99,8 +95,7 @@ var Module=(function (){
             _currentblueprint.points.push({x:coorX,y:coorY});
             console.log(_currentblueprint);
             redraw(_currentblueprint);
-            var punto = [event.pageX-offset.left,event.pageY-offset.top];
-            //puntosNuevos.push(punto);
+
     }
 
     //Helper function to get correct page offset for the Pointer coords
@@ -158,9 +153,24 @@ var Module=(function (){
         return putPromise;
     }
 
+     function blueprintGet (){
+        var getPromise = $.get("http://localhost:8080/blueprints/"+_currentblueprint.author);
+
+        getPromise.then(
+            function(data){
+                _table(data)
+            },
+            function(){
+                console.log('error')
+            }
+        );
+
+        return getPromise;
+    }
+
     function save() {
         if(_currentblueprint.name != null && _currentblueprint.author != null){
-            putBlueprint();
+            putBlueprint().then(blueprintGet);
         }
     }
 
