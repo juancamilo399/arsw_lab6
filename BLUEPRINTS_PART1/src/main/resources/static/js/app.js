@@ -57,19 +57,8 @@ var Module=(function (){
 
      }
 
-
-    function guardarBlueprint(datos){
-        /*return $.ajax({
-            url: "/AddNewBlueprint",
-            type: 'POST',
-            data: ,
-            contentType: "application/json"
-        });
-        */
-    }
-
     function _draw(blueprints) {
-        _currentblueprint = blueprints;
+        _currentblueprint=blueprints;
         $("#canvasName").text("Current blueprint: " + blueprints.name);
         redraw(_currentblueprint);
     }
@@ -89,15 +78,13 @@ var Module=(function (){
 
     function draw(event) {
         var canvas = document.getElementById("canvasBlueprint"),
-        context = canvas.getContext("2d");
+            context = canvas.getContext("2d");
         var offset  = getOffset(canvas);
         var coorX= event.pageX-offset.left;
         var coorY= event.pageY-offset.top;
         _currentblueprint.points.push({x:coorX,y:coorY});
         console.log(_currentblueprint);
         redraw(_currentblueprint);
-        var punto = [event.pageX-offset.left,event.pageY-offset.top];
-        //puntosNuevos.push(punto);
     }
 
     //Helper function to get correct page offset for the Pointer coords
@@ -151,6 +138,35 @@ var Module=(function (){
         return putPromise;
     }
 
+    function delBlueprint(){
+        var delPromise = $.ajax({
+            url: "/blueprints/"+_currentblueprint.author+"/"+_currentblueprint.name,
+            type: 'DELETE',
+        });
+        delPromise.then(
+            function () {
+                console.info("blueprint deleted");
+            },
+            function () {
+                console.info("error");
+            }
+        );
+        return delPromise;
+    }
+
+    function blueprintGet (){
+        var getPromise = $.get("http://localhost:8080/blueprints/"+_currentblueprint.author);
+        getPromise.then(
+            function(data){
+                _table(data)
+            },
+            function(){
+                console.log('error')
+            }
+        );
+        return getPromise;
+    }
+
     function pedirNombre() {
         var nombre = prompt("Type the blueprint name.");
         while (!nombre){
@@ -158,10 +174,10 @@ var Module=(function (){
         }
         _currentblueprint.name = nombre;
         console.log(JSON.stringify(_currentblueprint));
-        saveBlueprint();
+        saveBlueprint().then(blueprintGet);
     }
 
-    function saveBlueprint (){
+    function saveBlueprint(){
         var postPromise = $.ajax({
             url: "/blueprints",
             type: 'POST',
@@ -180,27 +196,35 @@ var Module=(function (){
         return postPromise;
     }
 
-    function save() {
-        if (_currentblueprint.author != null){
-            console.log(_currentblueprint);
-            if(_currentblueprint.name != null && _currentblueprint.name != ""){
-                putBlueprint();
+     function blueprintGet (){
+        var getPromise = $.get("http://localhost:8080/blueprints/"+_currentblueprint.author);
+        getPromise.then(
+            function(data){
+                _table(data)
+            },
+            function(){
+                console.log('error')
             }
-            if(_currentblueprint.name != null && _currentblueprint.name == ""){
+        );
+
+        return getPromise;
+    }
+
+    function save() {
+        if (_currentblueprint.author != null) {
+            console.log(_currentblueprint);
+            if (_currentblueprint.name != null && _currentblueprint.name != "") {
+                putBlueprint().then(blueprintGet);
+            }
+            if (_currentblueprint.name != null && _currentblueprint.name == "") {
                 pedirNombre();
             }
         }
-
-    }
-
-    function reloadTable() {
-        client.getBlueprintsByAuthor(_currentblueprint.author, _table);
-
     }
 
     function del() {
         if(_currentblueprint.name != null && _currentblueprint.author != null){
-            client.deleteBlueprint(_currentblueprint.name,_currentblueprint.author,reloadTable  );
+            delBlueprint().then(blueprintGet);
         }
     }
 
