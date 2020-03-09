@@ -17,8 +17,21 @@ var client = (function() {
             }
         });
     }
+
+    function deleteBlueprint(name, author,callback) {
+        $.ajax({
+            url: "http://localhost:8080/blueprints/"+author+"/"+name,
+            type: 'DELETE',
+            success: function(result) {
+                console.log(result);
+                callback();
+            }
+        });
+    }
+
     return {
         getBlueprintsByAuthor: getBlueprintsByAuthor,
-        getBlueprintsByNameAndAuthor: getBlueprintsByNameAndAuthor
+        getBlueprintsByNameAndAuthor: getBlueprintsByNameAndAuthor,
+        deleteBlueprint:deleteBlueprint
     };
 })();

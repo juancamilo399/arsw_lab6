@@ -19,25 +19,29 @@ var Module=(function (){
     };
 
     function _table(blueprints) {
-        blueprints = _map(blueprints);
-        _numberPoints(blueprints);
+        console.log(blueprints);
         $("#tableBlueprints > tbody").empty();
-        blueprints.map(function(blueprint) {
-            $("#tableBlueprints > tbody").append(
-                "<tr> <td style=\"border:1px solid #000000;\">" +
-                blueprint.bpname +
-                "</td>" +
-                "<td style=\"border:1px solid #000000;\">" +
-                blueprint.numberPoints +
-                "</td> " +
-                "<td style=\"border:1px solid #000000;\"><form><button type='button' onclick='Module.getBlueprintsAuthorAndName( \"" +
-                _author +
-                '" , "' +
-                blueprint.bpname +
-                "\")'>Open</button></form></td>" +
-                "</tr>"
-            );
-        });
+        if (blueprints!=null){
+            blueprints = _map(blueprints);
+            _numberPoints(blueprints);
+
+            blueprints.map(function(blueprint) {
+                $("#tableBlueprints > tbody").append(
+                    "<tr> <td style=\"border:1px solid #000000;\">" +
+                    blueprint.bpname +
+                    "</td>" +
+                    "<td style=\"border:1px solid #000000;\">" +
+                    blueprint.numberPoints +
+                    "</td> " +
+                    "<td style=\"border:1px solid #000000;\"><form><button type='button' onclick='Module.getBlueprintsAuthorAndName( \"" +
+                    _author +
+                    '" , "' +
+                    blueprint.bpname +
+                    "\")'>Open</button></form></td>" +
+                    "</tr>"
+                );
+            });
+        }
     };
 
     function init() {
@@ -51,15 +55,8 @@ var Module=(function (){
             canvas.addEventListener("mousedown", draw, false);
         }
 
-        //pedir nombre
-        //var datos = mapearJson();
-        //guardarBlueprint();
-        //puntosNuevos = [];
      }
 
-     function mapearJson(){
-        var s = "{ author ";
-     }
 
     function guardarBlueprint(datos){
         /*return $.ajax({
@@ -72,7 +69,7 @@ var Module=(function (){
     }
 
     function _draw(blueprints) {
-        _currentblueprint=blueprints;
+        _currentblueprint = blueprints;
         $("#canvasName").text("Current blueprint: " + blueprints.name);
         redraw(_currentblueprint);
     }
@@ -91,16 +88,16 @@ var Module=(function (){
     }
 
     function draw(event) {
-            var canvas = document.getElementById("canvasBlueprint"),
-            context = canvas.getContext("2d");
-            var offset  = getOffset(canvas);
-            var coorX= event.pageX-offset.left;
-            var coorY= event.pageY-offset.top;
-            _currentblueprint.points.push({x:coorX,y:coorY});
-            console.log(_currentblueprint);
-            redraw(_currentblueprint);
-            var punto = [event.pageX-offset.left,event.pageY-offset.top];
-            //puntosNuevos.push(punto);
+        var canvas = document.getElementById("canvasBlueprint"),
+        context = canvas.getContext("2d");
+        var offset  = getOffset(canvas);
+        var coorX= event.pageX-offset.left;
+        var coorY= event.pageY-offset.top;
+        _currentblueprint.points.push({x:coorX,y:coorY});
+        console.log(_currentblueprint);
+        redraw(_currentblueprint);
+        var punto = [event.pageX-offset.left,event.pageY-offset.top];
+        //puntosNuevos.push(punto);
     }
 
     //Helper function to get correct page offset for the Pointer coords
@@ -117,8 +114,6 @@ var Module=(function (){
               } while(obj = obj.offsetParent );
               return {left: offsetLeft, top: offsetTop};
     }
-
-
 
     function getBlueprintsAuthor(author) {
         _setAuthorName(author);
@@ -138,7 +133,6 @@ var Module=(function (){
 
 
     function putBlueprint (){
-
         var putPromise = $.ajax({
             url: "/blueprints/"+_currentblueprint.author+"/"+_currentblueprint.name,
             type: 'PUT',
@@ -154,19 +148,75 @@ var Module=(function (){
                 console.info("error");
             }
         );
-
         return putPromise;
     }
 
-    function save() {
-        if(_currentblueprint.name != null && _currentblueprint.author != null){
-            putBlueprint();
+    function pedirNombre() {
+        var nombre = prompt("Type the blueprint name.");
+        while (!nombre){
+            nombre = prompt("Type the blueprint name.");
         }
+        _currentblueprint.name = nombre;
+        console.log(JSON.stringify(_currentblueprint));
+        saveBlueprint();
+    }
+
+    function saveBlueprint (){
+        var postPromise = $.ajax({
+            url: "/blueprints",
+            type: 'POST',
+            data: JSON.stringify(_currentblueprint),
+            contentType: "application/json"
+        });
+
+        postPromise.then(
+            function () {
+                console.info("blueprint created");
+            },
+            function () {
+                console.info("error");
+            }
+        );
+        return postPromise;
+    }
+
+    function save() {
+        if (_currentblueprint.author != null){
+            console.log(_currentblueprint);
+            if(_currentblueprint.name != null && _currentblueprint.name != ""){
+                putBlueprint();
+            }
+            if(_currentblueprint.name != null && _currentblueprint.name == ""){
+                pedirNombre();
+            }
+        }
+
+    }
+
+    function reloadTable() {
+        client.getBlueprintsByAuthor(_currentblueprint.author, _table);
+
+    }
+
+    function del() {
+        if(_currentblueprint.name != null && _currentblueprint.author != null){
+            client.deleteBlueprint(_currentblueprint.name,_currentblueprint.author,reloadTable  );
+        }
+    }
+
+    function crearBlueprint(author){
+        if (author == "" || author == null) {
+            alert("Ingrese un valor para el autor");
+        }
+        _currentblueprint = {author: author, name: "", points: []};
+        init();
     }
 
     return {
         getBlueprintsAuthor: getBlueprintsAuthor,
         getBlueprintsAuthorAndName: getBlueprintsAuthorAndName,
-        save:save
+        save:save,
+        del:del,
+        crearBlueprint:crearBlueprint
     };
 })();

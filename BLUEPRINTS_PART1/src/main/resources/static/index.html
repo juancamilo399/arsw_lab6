@@ -51,13 +51,13 @@
 
         <div style="float: right">
             <h2 id="canvasName"></h2>
-            <button type="button" class="btn-success btn" id="Buttondraw">Create new blueprint</button>
+            <button type="button" class="btn-success btn" id="Buttondraw" onclick="Module.crearBlueprint(autor.value)">Create new blueprint</button>
             </br>
             </br>
             <canvas id="canvasBlueprint" width="500" height="500" style="border:1px solid #000000;"> </canvas>
             </br>
             <button type="button" class="btn btn-success" id="Buttonsave" onclick="Module.save()">save/update</button>
-            <button type="button" class="btn btn-danger" id="Buttondelete">delete</button>
+            <button type="button" class="btn btn-danger" id="Buttondelete" onclick="Module.del()">delete</button>
             </br>
         </div>
 
